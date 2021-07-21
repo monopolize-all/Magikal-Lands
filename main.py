@@ -8,10 +8,10 @@ from saves import *
 pygame.init()
 TILES_IN_WIDTH = 15
 TILES_IN_HEIGHT = 11
-TILES_IN_SCREEN = numpy.array((TILES_IN_WIDTH, TILES_IN_HEIGHT), dtype=numpy.int)
+TILES_IN_SCREEN = numpy.array((TILES_IN_WIDTH, TILES_IN_HEIGHT))
 SCREEN_WIDTH = TILE_WIDTH * TILES_IN_WIDTH
 SCREEN_HEIGHT = TILE_HEIGHT * TILES_IN_HEIGHT
-SCREEN_SIZE = numpy.array((SCREEN_WIDTH, SCREEN_HEIGHT), dtype=numpy.int)
+SCREEN_SIZE = numpy.array((SCREEN_WIDTH, SCREEN_HEIGHT))
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Mage Wars")
 
@@ -336,7 +336,7 @@ class World_Map(pygame.sprite.Sprite):
         chunk_y_start = max(player_chunk_y-chunks_in_height_of_map_div_2, 0)
         chunk_y_end = min(player_chunk_y+chunks_in_height_of_map_div_2, CHUNKS_IN_HEIGHT_OF_MAP - 1)
 
-        self.current_chunks_in_map = numpy.array((chunk_x_end-chunk_x_start, chunk_y_end-chunk_y_start), dtype=numpy.int)
+        self.current_chunks_in_map = numpy.array((chunk_x_end-chunk_x_start, chunk_y_end-chunk_y_start))
 
         self.current_map_size = self.chunks_in_map * self.chunk_size_in_map
 
@@ -567,7 +567,7 @@ class UI(pygame.sprite.Sprite):
         to_display_bottom_right = ["FPS: " + str(fps)]
 
         to_display_top_left_max_width = 0
-        current_blit_position = numpy.array((10, 10), dtype=numpy.int)
+        current_blit_position = numpy.array((10, 10))
         for content in to_display_top_left:
             content_label = self.label(content)
             content_label_rect = content_label.get_rect(topleft=current_blit_position)
@@ -575,21 +575,21 @@ class UI(pygame.sprite.Sprite):
             current_blit_position += [0, content_label_rect.height]
             to_display_top_left_max_width = max(to_display_top_left_max_width, content_label_rect.width)
 
-        current_blit_position = numpy.array((SCREEN_WIDTH - 10, 10), dtype=numpy.int)
+        current_blit_position = numpy.array((SCREEN_WIDTH - 10, 10))
         for content in to_display_top_right:
             content_label = self.label(content)
             content_label_rect = content_label.get_rect(topright=current_blit_position)
             screen.blit(content_label, content_label_rect)
             current_blit_position += [0, content_label_rect.height]
 
-        current_blit_position = numpy.array((10, SCREEN_HEIGHT - 10), dtype=numpy.int)
+        current_blit_position = numpy.array((10, SCREEN_HEIGHT - 10))
         for content in to_display_bottom_left:
             content_label = self.label(content)
             content_label_rect = content_label.get_rect(bottomleft=current_blit_position)
             screen.blit(content_label, content_label_rect)
             current_blit_position -= [0, content_label_rect.height]
 
-        current_blit_position = numpy.array((SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10), dtype=numpy.int)
+        current_blit_position = numpy.array((SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10))
         for content in to_display_bottom_right:
             content_label = self.label(content)
             content_label_rect = content_label.get_rect(bottomright=current_blit_position)
