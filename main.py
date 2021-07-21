@@ -320,6 +320,20 @@ class World_Map(pygame.sprite.Sprite):
 
         self.need_to_blit_world_map = True
 
+    def toggle_map_view(self):
+        global screen_update_required
+
+        if world_map in sprites_to_render:
+            sprites_to_render.remove(world_map)
+            if DEBUG:
+                print("Closed world map.")
+        else:
+            sprites_to_render.add(world_map)
+            if DEBUG:
+                print("Opened world map.")
+
+        screen_update_required = True
+
     def blit_world_map(self):
         get_tile_type = tile_map.tile_type_based_on_properties
         map_height = self.max_map_size[1]
@@ -386,13 +400,24 @@ class Player(pygame.sprite.Sprite):
         #self.player_offset_position_in_map = save_data["player_offset_position"]
         self.player_tile_position_in_map = tile_map.player_tile_position_in_map
         self.player_offset_position_in_map = tile_map.player_offset_position_in_map
-        
 
         self.last_key_pressed = None
 
         self.animation_stage = 0
         self.animation_step_max_duration = 15
         self.animation_step_duration = 0
+
+    def slow_down_player(self):
+        save_data["player_move_speed"] /= 2
+        self.player_move_speed = save_data["player_move_speed"]
+        if DEBUG:
+            print(f"Player speed decreased to {save_data['player_move_speed']}")
+
+    def speed_up_player(self):
+        save_data["player_move_speed"] *= 2
+        self.player_move_speed = save_data["player_move_speed"]
+        if DEBUG:
+            print(f"Player speed increased to {save_data['player_move_speed']}")
 
     def for_keys_pressed(self, keys_pressed):
         if self.last_key_pressed:
@@ -614,6 +639,8 @@ class World_Manager():
         self.chunks_having_orbs = []
         self.update_chunks_having_orbs()
 
+        self.live_diffusion_enabled = False
+
     def update_chunks_having_orbs(self):
         self.chunks_having_orbs = []
 
@@ -667,6 +694,55 @@ class World_Manager():
         tile_map.need_to_blit_everything = True
         world_map.need_to_blit_world_map = True
 
+    def run_entities(self):
+        if DEBUG:
+            print("Updating entities.")
+        self.orbs_effect_on_chunks()
+        
+    def run_chunk_properties_diffusion(self):
+        if DEBUG:
+            print("Diffusing physical properties.")
+        for chunk_property in self.map_chunk_properties:
+            self.diffuse_property(chunk_property)
+
+    def toggle_live_diffusion(self):
+        if self.live_diffusion_enabled:
+            self.live_diffusion_enabled = False
+            if DEBUG:
+                print("Live diffusion disabled.")
+
+        else:
+            self.live_diffusion_enabled = True
+            if DEBUG:
+                print("Live diffusion enabled.")
+
+    def step_live_diffusion(self):
+        if self.live_diffusion_enabled:
+            self.run_entities()
+            self.run_chunk_properties_diffusion()
+
+    def time_warp(self, frames_being_skipped):
+        for i in range(frames_being_skipped):
+            world_manager.run_entities()
+            world_manager.run_chunk_properties_diffusion()
+        if DEBUG:
+            print("Time warped.")
+
+    def small_time_warp(self):
+        if DEBUG:
+            print("Initiating small time warp.")
+        self.time_warp(100)
+
+    def medium_time_warp(self):
+        if DEBUG:
+            print("Initiating medium time warp.")
+        self.time_warp(1000)
+
+    def large_time_warp(self):
+        if DEBUG:
+            print("Initiating large time warp.")
+        self.time_warp(10000)
+
     """def entity_effect_on_chunks(self):
         chunk_properties_difference_from_equilibrium = {}
         for chunk_property in self.properties:
@@ -713,39 +789,45 @@ ui = UI()
 
 # endregion
 
-# region Miscellaneous
+# region Debugging
 
-start = time.time()
-world_manager.orbs_effect_on_chunks()
-print("Entities effect time:", time.time() - start)
+DEBUG = True
 
-start = time.time()
-world_manager.diffuse_property("temperature")
-print("Propeties spread time: ", time.time() - start)
+if DEBUG:
+    start = time.time()
+    world_manager.run_entities()
+    print("Time taken to update entities in world:", time.time() - start)
 
-def run_entities():
-    world_manager.orbs_effect_on_chunks()
-    
-def run_chunk_properties_diffusion():
-    for chunk_property in save_data["map_chunk_properties"]:
-        world_manager.diffuse_property(chunk_property)
+    start = time.time()
+    world_manager.run_chunk_properties_diffusion()
+    print("Time taken for one iteration of physical property diffusion: ", time.time() - start)
 
-def time_warp():
-    for i in range(500):
-        run_entities()
-        run_chunk_properties_diffusion()
-    print("TIME WARPED.")
+# endregion
 
-for i in range(0):
-    time_warp()
+#region event management
 
-USER_EVENTS = {
-    pygame.USEREVENT + 1: {"delay": 500, "function": run_entities},
-    pygame.USEREVENT + 2: {"delay": 500, "function": run_chunk_properties_diffusion},
+KEYUP_EVENTS = {
+    pygame.K_m: world_map.toggle_map_view,
+    pygame.K_1: world_manager.run_chunk_properties_diffusion,
+    pygame.K_2: world_manager.run_entities,
+    pygame.K_3: world_manager.toggle_live_diffusion,
+    pygame.K_4: world_manager.small_time_warp,
+    pygame.K_5: world_manager.medium_time_warp,
+    pygame.K_6: world_manager.large_time_warp,
+    pygame.K_7: player.slow_down_player,
+    pygame.K_8: player.speed_up_player,
+}
+KEYUP_EVENTS_KEYS = KEYUP_EVENTS.keys()  # Here KEYS refers to the keys of the dict TIMED_EVENTS
+
+TIMED_EVENTS = {
+    pygame.USEREVENT + 1: {"delay": 500, "function": world_manager.step_live_diffusion},
+    #pygame.USEREVENT + 2: {"delay": 500, "function": run_entities},
+    #pygame.USEREVENT + 3: {"delay": 500, "function": run_chunk_properties_diffusion},
     #pygame.USEREVENT + 3: {"delay": 2000, "function": time_warp}
 }
+TIMED_EVENTS_KEYS = TIMED_EVENTS.keys()  # Here KEYS refers to the keys of the dict TIMED_EVENTS
 
-for event_key, event_values in USER_EVENTS.items():
+for event_key, event_values in TIMED_EVENTS.items():
     pygame.time.set_timer(event_key, event_values["delay"])
 
 # endregion
@@ -761,25 +843,11 @@ while not game_quit:
             if event.key == pygame.K_q:
                 game_quit = True
 
-            if event.key == pygame.K_1:
-                for chunk_property in world_manager.properties:
-                    world_manager.diffuse_property(chunk_property)
+            if event.key in KEYUP_EVENTS_KEYS:  # Here KEYS refers to the keys of the dict TIMED_EVENTS
+                KEYUP_EVENTS[event.key]()
 
-            if event.key == pygame.K_2:
-                world_manager.orbs_effect_on_chunks()
-
-            if event.key == pygame.K_3:
-                time_warp()
-
-            if event.key == pygame.K_m:
-                if world_map in sprites_to_render:
-                    sprites_to_render.remove(world_map)
-                else:
-                    sprites_to_render.add(world_map)
-                screen_update_required = True
-
-        elif event.type in USER_EVENTS:
-            USER_EVENTS[event.type]["function"]()
+        elif event.type in TIMED_EVENTS_KEYS:  # Here KEYS refers to the keys of the dict TIMED_EVENTS
+            TIMED_EVENTS[event.type]["function"]()
 
     keys_pressed = pygame.key.get_pressed()
     player.for_keys_pressed(keys_pressed)
