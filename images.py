@@ -129,7 +129,7 @@ ENTITY_TILESET_KEYS = {
     "humid_orb": (0, 1),
     "dry_orb": (1, 1),
     "frozen_orb": (2, 1),
-    "desert_ord": (3, 1),
+    "desert_orb": (3, 1),
     "blessed_orb": (4, 1),
     "cursed_orb": (5, 1),
 }
