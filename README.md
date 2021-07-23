@@ -11,6 +11,42 @@ Different environmental conditions can lead to different tile types. Currently t
 
 For efficiency during runtime, the entire world map has been divided into chunks and each chunk has particular environmental conditions(temperature and humidity). The environmental conditions of any tile is then calculated from the chunk it is in and the surrounding chunks, with a weight function dependant on the distance of that tile from the center of the chunks.
 
+Also, the temperature and humidity are measured in a scale of 1 to 100.  
+Temperature of 1: Very cold.  
+Temperature of 100: Very hot.  
+Humidity of 1: Very dry.  
+Humidity of 100: Very humid.  
+
+
+# Screenshots
+
+Plains.
+![Plains](https://github.com/monopolize-all/Magikal-Lands/blob/master/Screenshots/Plains.png)
+
+Plains to snow transition.
+![Snow transition](https://github.com/monopolize-all/Magikal-Lands/blob/master/Screenshots/Snow%20transition.png)
+
+Plains to swamp transition.
+![Swamp transition](https://github.com/monopolize-all/Magikal-Lands/blob/master/Screenshots/Swampy%20transition.png)
+
+Plains to desert transition.
+![Desert transition](https://github.com/monopolize-all/Magikal-Lands/blob/master/Screenshots/Desert%20transition.png)
+
+Plains to wasteland transition.
+![Wasteland transition](https://github.com/monopolize-all/Magikal-Lands/blob/master/Screenshots/Wasteland%20transition.png)
+
+Cold orb. Reduces temperature of surroundings.
+![Cold orb](https://github.com/monopolize-all/Magikal-Lands/blob/master/Screenshots/Cold%20orb.png)
+
+Map view.
+![Map view](https://github.com/monopolize-all/Magikal-Lands/blob/master/Screenshots/Map%20before%20diffusion.png)
+
+Map during start of diffusion.
+![Diffusion start](https://github.com/monopolize-all/Magikal-Lands/blob/master/Screenshots/Map%20during%20start%20of%20diffusion.png)
+
+Map after diffusion reaches equilibrium.
+![Diffusion end](https://github.com/monopolize-all/Magikal-Lands/blob/master/Screenshots/map%20after%20diffusion%20equilibrium.png)
+
 
 # Running the program
 
@@ -58,6 +94,7 @@ q -> Closes the game.
 
 
 # Known issues
+
 
 
 # Credits
